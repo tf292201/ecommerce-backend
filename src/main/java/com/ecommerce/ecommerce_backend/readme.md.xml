@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<indexing>
+ <paragraph index="9" node_type="writer">USERS TABLE</paragraph>
+ <paragraph index="10" node_type="writer">- id (BIGINT, PRIMARY KEY, AUTO_INCREMENT)</paragraph>
+ <paragraph index="11" node_type="writer">- username (VARCHAR, UNIQUE, NOT NULL)</paragraph>
+ <paragraph index="12" node_type="writer">- email (VARCHAR, UNIQUE, NOT NULL) </paragraph>
+ <paragraph index="13" node_type="writer">- password (VARCHAR, NOT NULL)</paragraph>
+ <paragraph index="14" node_type="writer">- first_name (VARCHAR, NOT NULL)</paragraph>
+ <paragraph index="15" node_type="writer">- last_name (VARCHAR, NOT NULL)</paragraph>
+ <paragraph index="16" node_type="writer">- phone_number (VARCHAR)</paragraph>
+ <paragraph index="17" node_type="writer">- role (ENUM: 'CUSTOMER', 'ADMIN', NOT NULL, DEFAULT 'CUSTOMER')</paragraph>
+ <paragraph index="18" node_type="writer">- active (BOOLEAN, NOT NULL, DEFAULT TRUE)</paragraph>
+ <paragraph index="19" node_type="writer">- created_at (DATETIME, NOT NULL)</paragraph>
+ <paragraph index="20" node_type="writer">- updated_at (DATETIME)</paragraph>
+ <paragraph index="22" node_type="writer">PRODUCTS TABLE </paragraph>
+ <paragraph index="23" node_type="writer">- id (BIGINT, PRIMARY KEY, AUTO_INCREMENT)</paragraph>
+ <paragraph index="24" node_type="writer">- name (VARCHAR, NOT NULL)</paragraph>
+ <paragraph index="25" node_type="writer">- description (TEXT, LENGTH 1000)</paragraph>
+ <paragraph index="26" node_type="writer">- short_description (VARCHAR)</paragraph>
+ <paragraph index="27" node_type="writer">- price (DECIMAL(19,2), NOT NULL)</paragraph>
+ <paragraph index="28" node_type="writer">- stock_quantity (INT, NOT NULL, DEFAULT 0)</paragraph>
+ <paragraph index="29" node_type="writer">- active (BOOLEAN, NOT NULL, DEFAULT TRUE)</paragraph>
+ <paragraph index="30" node_type="writer">- image_url (VARCHAR)</paragraph>
+ <paragraph index="31" node_type="writer">- created_at (DATETIME)</paragraph>
+ <paragraph index="32" node_type="writer">- updated_at (DATETIME)</paragraph>
+ <paragraph index="34" node_type="writer">SHOPPING_CARTS TABLE</paragraph>
+ <paragraph index="35" node_type="writer">- id (BIGINT, PRIMARY KEY, AUTO_INCREMENT)</paragraph>
+ <paragraph index="36" node_type="writer">- user_id (BIGINT, NOT NULL, FOREIGN KEY → users.id)</paragraph>
+ <paragraph index="37" node_type="writer">- total_amount (DECIMAL(19,2), DEFAULT 0.00)</paragraph>
+ <paragraph index="38" node_type="writer">- created_at (DATETIME)</paragraph>
+ <paragraph index="39" node_type="writer">- updated_at (DATETIME)</paragraph>
+ <paragraph index="41" node_type="writer">CART_ITEMS TABLE</paragraph>
+ <paragraph index="42" node_type="writer">- id (BIGINT, PRIMARY KEY, AUTO_INCREMENT)</paragraph>
+ <paragraph index="43" node_type="writer">- shopping_cart_id (BIGINT, NOT NULL, FOREIGN KEY → shopping_carts.id)</paragraph>
+ <paragraph index="44" node_type="writer">- product_id (BIGINT, NOT NULL, FOREIGN KEY → products.id)</paragraph>
+ <paragraph index="45" node_type="writer">- quantity (INT, NOT NULL)</paragraph>
+ <paragraph index="46" node_type="writer">- unit_price (DECIMAL(19,2), NOT NULL)</paragraph>
+ <paragraph index="47" node_type="writer">- total_price (DECIMAL(19,2), NOT NULL)</paragraph>
+ <paragraph index="48" node_type="writer">- created_at (DATETIME)</paragraph>
+ <paragraph index="49" node_type="writer">- updated_at (DATETIME)</paragraph>
+ <paragraph index="58" node_type="writer">ORDERS TABLE</paragraph>
+ <paragraph index="59" node_type="writer">- id (BIGINT, PRIMARY KEY, AUTO_INCREMENT)</paragraph>
+ <paragraph index="60" node_type="writer">- order_number (VARCHAR, UNIQUE, NOT NULL)</paragraph>
+ <paragraph index="61" node_type="writer">- user_id (BIGINT, NOT NULL, FOREIGN KEY → users.id)</paragraph>
+ <paragraph index="62" node_type="writer">- status (ENUM: 'PENDING', 'CONFIRMED', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELLED', 'RETURNED')</paragraph>
+ <paragraph index="63" node_type="writer">- total_amount (DECIMAL(19,2), NOT NULL)</paragraph>
+ <paragraph index="64" node_type="writer">- shipping_amount (DECIMAL(19,2), DEFAULT 0.00)</paragraph>
+ <paragraph index="65" node_type="writer">- tax_amount (DECIMAL(19,2), DEFAULT 0.00)</paragraph>
+ <paragraph index="66" node_type="writer">- shipping_address_id (BIGINT, FOREIGN KEY → addresses.id)</paragraph>
+ <paragraph index="67" node_type="writer">- billing_address_id (BIGINT, FOREIGN KEY → addresses.id)</paragraph>
+ <paragraph index="68" node_type="writer">- payment_method (VARCHAR)</paragraph>
+ <paragraph index="69" node_type="writer">- payment_status (ENUM: 'PENDING', 'PAID', 'FAILED', 'REFUNDED')</paragraph>
+ <paragraph index="70" node_type="writer">- order_date (DATETIME, NOT NULL)</paragraph>
+ <paragraph index="71" node_type="writer">- shipped_date (DATETIME)</paragraph>
+ <paragraph index="72" node_type="writer">- delivered_date (DATETIME)</paragraph>
+ <paragraph index="73" node_type="writer">- created_at (DATETIME)</paragraph>
+ <paragraph index="74" node_type="writer">- updated_at (DATETIME)</paragraph>
+ <paragraph index="76" node_type="writer">ORDER_ITEMS TABLE</paragraph>
+ <paragraph index="77" node_type="writer">- id (BIGINT, PRIMARY KEY, AUTO_INCREMENT)</paragraph>
+ <paragraph index="78" node_type="writer">- order_id (BIGINT, NOT NULL, FOREIGN KEY → orders.id)</paragraph>
+ <paragraph index="79" node_type="writer">- product_id (BIGINT, NOT NULL, FOREIGN KEY → products.id)</paragraph>
+ <paragraph index="80" node_type="writer">- quantity (INT, NOT NULL)</paragraph>
+ <paragraph index="81" node_type="writer">- unit_price (DECIMAL(19,2), NOT NULL)</paragraph>
+ <paragraph index="82" node_type="writer">- total_price (DECIMAL(19,2), NOT NULL)</paragraph>
+ <paragraph index="84" node_type="writer">ADDRESSES TABLE</paragraph>
+ <paragraph index="85" node_type="writer">- id (BIGINT, PRIMARY KEY, AUTO_INCREMENT)</paragraph>
+ <paragraph index="86" node_type="writer">- user_id (BIGINT, NOT NULL, FOREIGN KEY → users.id)</paragraph>
+ <paragraph index="87" node_type="writer">- address_line_1 (VARCHAR, NOT NULL)</paragraph>
+ <paragraph index="88" node_type="writer">- address_line_2 (VARCHAR)</paragraph>
+ <paragraph index="89" node_type="writer">- city (VARCHAR, NOT NULL)</paragraph>
+ <paragraph index="90" node_type="writer">- state (VARCHAR, NOT NULL)</paragraph>
+ <paragraph index="91" node_type="writer">- postal_code (VARCHAR, NOT NULL)</paragraph>
+ <paragraph index="92" node_type="writer">- country (VARCHAR, NOT NULL)</paragraph>
+ <paragraph index="93" node_type="writer">- is_default (BOOLEAN, DEFAULT FALSE)</paragraph>
+ <paragraph index="94" node_type="writer">- type (ENUM: 'BILLING', 'SHIPPING', 'BOTH', DEFAULT 'BOTH')</paragraph>
+ <paragraph index="96" node_type="writer">User ↔ ShoppingCart: One-to-One (each user has one cart) </paragraph>
+ <paragraph index="97" node_type="writer">ShoppingCart ↔ CartItems: One-to-Many (cart has multiple items) </paragraph>
+ <paragraph index="98" node_type="writer">Product ↔ CartItems: One-to-Many (product can be in multiple carts) </paragraph>
+ <paragraph index="99" node_type="writer">User ↔ Orders: One-to-Many (user can have multiple orders) </paragraph>
+ <paragraph index="100" node_type="writer">Order ↔ OrderItems: One-to-Many (order contains multiple items) </paragraph>
+ <paragraph index="101" node_type="writer">Product ↔ OrderItems: One-to-Many (product can be in multiple orders) </paragraph>
+ <paragraph index="102" node_type="writer">User ↔ Addresses: One-to-Many (user can have multiple addresses) </paragraph>
+ <paragraph index="103" node_type="writer">Address ↔ Orders: One-to-Many (address can be used for multiple orders)</paragraph>
+</indexing>
