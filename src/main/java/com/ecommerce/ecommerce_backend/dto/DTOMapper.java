@@ -6,6 +6,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
+
 public class DTOMapper {
     
     // User mappings
@@ -106,4 +107,45 @@ public class DTOMapper {
             cart.getUpdatedAt()
         );
     }
+
+    public static OrderDTO toOrderDTO(Order order) {
+        if (order == null) return null;
+        
+        OrderDTO dto = new OrderDTO();
+        dto.setId(order.getId());
+        dto.setOrderNumber(order.getOrderNumber());
+        dto.setUserId(order.getUser().getId());
+        dto.setUsername(order.getUser().getUsername());
+        dto.setOrderStatus(order.getStatus().toString());
+        dto.setTotalAmount(order.getTotalAmount());
+        
+        // For now, set addresses to null since Address entity getters aren't fully implemented
+        dto.setShippingAddress(null);
+        dto.setBillingAddress(null);
+        
+        // Map order items
+        List<OrderItemDTO> orderItemDTOs = order.getOrderItems().stream()
+            .map(DTOMapper::toOrderItemDTO)
+            .collect(Collectors.toList());
+        dto.setOrderItems(orderItemDTOs);
+        
+        dto.setCreatedAt(order.getCreatedAt());
+        dto.setUpdatedAt(order.getUpdatedAt());
+        
+        return dto;
+    }
+    
+    public static OrderItemDTO toOrderItemDTO(OrderItem orderItem) {
+        if (orderItem == null) return null;
+        
+        return new OrderItemDTO(
+            orderItem.getId(),
+            orderItem.getProduct().getId(),
+            orderItem.getProduct().getName(),
+            orderItem.getQuantity(),
+            orderItem.getUnitPrice(),
+            orderItem.getTotalPrice()
+        );
+    }
+    
 }

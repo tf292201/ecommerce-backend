@@ -1,6 +1,7 @@
 package com.ecommerce.ecommerce_backend.controller;
 
 import com.ecommerce.ecommerce_backend.dto.*;
+import com.ecommerce.ecommerce_backend.entity.Role;
 import com.ecommerce.ecommerce_backend.entity.User;
 import com.ecommerce.ecommerce_backend.security.JwtUtil;
 import com.ecommerce.ecommerce_backend.service.UserService;
@@ -141,4 +142,51 @@ public class AuthController {
         // by simply removing the token from storage
         return ResponseEntity.ok(new MessageResponseDTO("User logged out successfully!"));
     }
+
+    // Add this method to your AuthController.java (TEMPORARY - remove after creating admin)
+
+@PostMapping("/create-admin")
+public ResponseEntity<?> createAdmin(@Valid @RequestBody RegisterRequestDTO registerRequest) {
+    try {
+        // Check if username already exists
+        if (userService.existsByUsername(registerRequest.getUsername())) {
+            return ResponseEntity.badRequest()
+                .body(new MessageResponseDTO("Error: Username is already taken!"));
+        }
+
+        // Check if email already exists
+        if (userService.existsByEmail(registerRequest.getEmail())) {
+            return ResponseEntity.badRequest()
+                .body(new MessageResponseDTO("Error: Email is already in use!"));
+        }
+
+        // Create new admin user
+        /// DELETE LATER !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        User user = new User(
+            registerRequest.getUsername(),
+            registerRequest.getEmail(),
+            registerRequest.getPassword(),
+            registerRequest.getFirstName(),
+            registerRequest.getLastName()
+        );
+        user.setPhoneNumber(registerRequest.getPhoneNumber());
+        user.setRole(Role.ADMIN); // Set as ADMIN instead of CUSTOMER
+
+        User savedUser = userService.createUser(user);
+
+        // Generate JWT token
+        UserDetails userDetails = userService.loadUserByUsername(savedUser.getUsername());
+        String jwt = jwtUtil.generateToken(userDetails);
+
+        // Return success response with token
+        UserResponseDTO userResponseDTO = DTOMapper.toUserResponseDTO(savedUser);
+        AuthResponseDTO authResponse = new AuthResponseDTO(jwt, userResponseDTO);
+
+        return ResponseEntity.ok(authResponse);
+
+    } catch (Exception e) {
+        return ResponseEntity.badRequest()
+            .body(new MessageResponseDTO("Error: Could not create admin user. " + e.getMessage()));
+    }
+}
 }
