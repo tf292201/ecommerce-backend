@@ -8,6 +8,7 @@ import com.ecommerce.ecommerce_backend.entity.ShoppingCart;
 import com.ecommerce.ecommerce_backend.entity.User;
 import com.ecommerce.ecommerce_backend.repository.CartItemRepository;
 import com.ecommerce.ecommerce_backend.repository.ShoppingCartRepository;
+import com.ecommerce.ecommerce_backend.repository.UserRepository;
 
 import jakarta.transaction.Transactional;
 
@@ -19,6 +20,9 @@ import java.util.Optional;
 
 @Service
 public class ShoppingCartService {
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Autowired
     private ShoppingCartRepository shoppingCartRepository;
@@ -206,7 +210,7 @@ public class ShoppingCartService {
         cart.setUser(user);
         cart = shoppingCartRepository.save(cart);
         user.setShoppingCart(cart);
-        userService.updateUser(user.getId(), user);
+        userRepository.save(user);
         return cart;
     }
 

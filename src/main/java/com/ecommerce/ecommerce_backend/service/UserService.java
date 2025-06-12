@@ -24,11 +24,40 @@ public class UserService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        System.out.println("🔍 UserService.loadUserByUsername called with: " + username);
+        
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+        
+        System.out.println("✅ User found: " + user.getUsername());
+        System.out.println("🔐 Stored password hash: " + user.getPassword());
+        System.out.println("👤 User authorities: " + user.getAuthorities());
+        System.out.println("🎯 User enabled: " + user.isEnabled());
+        
         return user;
     }
 
+    // Add a method to test password matching
+    public boolean testPasswordMatch(String username, String rawPassword) {
+        Optional<User> userOpt = userRepository.findByUsername(username);
+        if (userOpt.isPresent()) {
+            User user = userOpt.get();
+            String storedHash = user.getPassword();
+            boolean matches = passwordEncoder.matches(rawPassword, storedHash);
+            
+            System.out.println("🧪 PASSWORD MATCH TEST 🧪");
+            System.out.println("Username: " + username);
+            System.out.println("Raw password: '" + rawPassword + "'");
+            System.out.println("Stored hash: " + storedHash);
+            System.out.println("Password matches: " + matches);
+            System.out.println("Password encoder: " + passwordEncoder.getClass().getSimpleName());
+            
+            return matches;
+        }
+        return false;
+    }
+
+    // Rest of your existing methods...
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
@@ -46,9 +75,15 @@ public class UserService implements UserDetailsService {
     }
 
     public User createUser(User user) {
-        // Encode password before saving
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        // Set default role if not specified
+        String rawPassword = user.getPassword();
+        String encodedPassword = passwordEncoder.encode(rawPassword);
+        
+        System.out.println("🆕 CREATING NEW USER 🆕");
+        System.out.println("Username: " + user.getUsername());
+        System.out.println("Raw password: '" + rawPassword + "'");
+        System.out.println("Encoded password: " + encodedPassword);
+        
+        user.setPassword(encodedPassword);
         if (user.getRole() == null) {
             user.setRole(Role.CUSTOMER);
         }

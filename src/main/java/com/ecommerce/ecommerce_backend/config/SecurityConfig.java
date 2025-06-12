@@ -1,9 +1,9 @@
 package com.ecommerce.ecommerce_backend.config;
 
 import com.ecommerce.ecommerce_backend.security.JwtAuthenticationFilter;
+import com.ecommerce.ecommerce_backend.security.JwtUtil;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -28,44 +28,43 @@ import java.util.Arrays;
 @EnableMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
 
-    // Remove @Lazy - we'll inject the dependencies directly
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http, JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http, 
+                                         JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
         http.cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .csrf(csrf -> csrf.disable())
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(authz -> authz
-    // Public endpoints - no authentication required
-    .requestMatchers("/api/auth/**").permitAll()
-    .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
-    
-    // MOVE USER ENDPOINTS TO THE TOP - Most specific rules first
-    .requestMatchers("/api/users/me").hasAnyRole("USER", "CUSTOMER", "ADMIN")
-    .requestMatchers("/api/users/me/**").hasAnyRole("USER", "CUSTOMER", "ADMIN")
-    .requestMatchers("/api/cart/me/**").hasAnyRole("USER", "CUSTOMER", "ADMIN")
-    .requestMatchers("/api/orders/me/**").hasAnyRole("USER", "CUSTOMER", "ADMIN")
-    .requestMatchers(HttpMethod.POST, "/api/orders").hasAnyRole("USER", "CUSTOMER", "ADMIN")
-    
-    // Admin only endpoints - AFTER the user endpoints
-    .requestMatchers(HttpMethod.GET, "/api/users").hasRole("ADMIN")
-    .requestMatchers(HttpMethod.GET, "/api/users/{id}").hasRole("ADMIN")
-    .requestMatchers(HttpMethod.DELETE, "/api/users/**").hasRole("ADMIN")
-    .requestMatchers(HttpMethod.POST, "/api/products").hasRole("ADMIN")
-    .requestMatchers(HttpMethod.PUT, "/api/products/**").hasRole("ADMIN")
-    .requestMatchers(HttpMethod.DELETE, "/api/products/**").hasRole("ADMIN")
-    .requestMatchers(HttpMethod.GET, "/api/orders").hasRole("ADMIN")
-    
-    // All other endpoints require authentication
-    .anyRequest().authenticated()
-);
+                // Public endpoints - no authentication required
+                .requestMatchers("/api/auth/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
+                .requestMatchers("/api/test/**").permitAll()
+                
+                // User endpoints - Most specific rules first
+                .requestMatchers("/api/users/me").hasAnyRole("USER", "CUSTOMER", "ADMIN")
+                .requestMatchers("/api/users/me/**").hasAnyRole("USER", "CUSTOMER", "ADMIN")
+                .requestMatchers("/api/cart/me/**").hasAnyRole("USER", "CUSTOMER", "ADMIN")
+                .requestMatchers("/api/orders/me/**").hasAnyRole("USER", "CUSTOMER", "ADMIN")
+                .requestMatchers(HttpMethod.POST, "/api/orders").hasAnyRole("USER", "CUSTOMER", "ADMIN")
+                
+                // Admin only endpoints
+                .requestMatchers(HttpMethod.GET, "/api/users").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.GET, "/api/users/{id}").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.DELETE, "/api/users/**").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.POST, "/api/products").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.PUT, "/api/products/**").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.DELETE, "/api/products/**").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.GET, "/api/orders").hasRole("ADMIN")
+                
+                // All other endpoints require authentication
+                .anyRequest().authenticated()
+            );
 
         // Add JWT filter
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
-
-    // Remove the constructor and field - let Spring inject directly into the method above
 
     @Bean
     public PasswordEncoder passwordEncoder() {

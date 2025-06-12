@@ -52,6 +52,17 @@ public class Order {
     @Column(updatable = false)
     private LocalDateTime createdAt;
     
+    @Column(name = "order_date")
+    private LocalDateTime orderDate;
+    
+    @PrePersist
+    protected void onCreate() {
+        if (orderDate == null) {
+            orderDate = LocalDateTime.now();
+        }
+    }
+
+
     @UpdateTimestamp
     private LocalDateTime updatedAt;
     
@@ -150,11 +161,19 @@ public class Order {
     public void setOrderItems(List<OrderItem> orderItems) {
         this.orderItems = orderItems;
     }
+
+    public LocalDateTime getOrderDate() {
+        return orderDate;
+    }
     
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
     
+    public void setOrderDate(LocalDateTime orderDate) {
+        this.orderDate = orderDate;
+    }
+
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }

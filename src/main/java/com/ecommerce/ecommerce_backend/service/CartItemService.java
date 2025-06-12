@@ -42,10 +42,10 @@ public class CartItemService {
         cartItemRepository.delete(cartItem);
     }
 
-    
-public void deleteAllByShoppingCartId(Long cartId) {
-    cartItemRepository.deleteByShoppingCartId(cartId);
-}
+    // Delete all cart items by shopping cart ID
+    public void deleteAllByShoppingCartId(Long cartId) {
+         cartItemRepository.deleteByShoppingCartId(cartId);
+    }
 
     // Update cart item quantity
     public CartItem updateCartItemQuantity(Long id, Integer quantity) {

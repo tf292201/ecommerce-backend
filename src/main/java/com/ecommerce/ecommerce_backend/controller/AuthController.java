@@ -73,37 +73,62 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequestDTO loginRequest) {
-        try {
-            // Authenticate user
-            authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                    loginRequest.getUsername(),
-                    loginRequest.getPassword()
-                )
-            );
+public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequestDTO loginRequest) {
+    System.out.println("🚀 LOGIN ATTEMPT 🚀");
+    System.out.println("Username: " + loginRequest.getUsername());
+    System.out.println("Password: '" + loginRequest.getPassword() + "'");
+    
+    try {
+        // Test password matching before authentication
+        boolean passwordMatches = userService.testPasswordMatch(loginRequest.getUsername(), loginRequest.getPassword());
+        System.out.println("🔐 Manual password test result: " + passwordMatches);
+        
+        // Authenticate user
+        System.out.println("🔄 Attempting Spring Security authentication...");
+        authenticationManager.authenticate(
+            new UsernamePasswordAuthenticationToken(
+                loginRequest.getUsername(),
+                loginRequest.getPassword()
+            )
+        );
+        System.out.println("✅ Spring Security authentication successful!");
 
-            // Load user details
-            UserDetails userDetails = userService.loadUserByUsername(loginRequest.getUsername());
-            User user = userService.getUserByUsername(loginRequest.getUsername()).get();
+        // Load user details
+        System.out.println("🔍 Loading user details...");
+        UserDetails userDetails = userService.loadUserByUsername(loginRequest.getUsername());
+        System.out.println("✅ UserDetails loaded: " + userDetails.getUsername());
+        
+        System.out.println("🔍 Getting user entity...");
+        User user = userService.getUserByUsername(loginRequest.getUsername()).get();
+        System.out.println("✅ User entity loaded: " + user.getUsername());
 
-            // Generate JWT token
-            String jwt = jwtUtil.generateToken(userDetails);
+        // Generate JWT token
+        System.out.println("🔑 Generating JWT token...");
+        String jwt = jwtUtil.generateToken(userDetails);
+        System.out.println("✅ JWT token generated: " + jwt.substring(0, 20) + "...");
 
-            // Return success response with token
-            UserResponseDTO userResponseDTO = DTOMapper.toUserResponseDTO(user);
-            AuthResponseDTO authResponse = new AuthResponseDTO(jwt, userResponseDTO);
+        // Return success response with token
+        System.out.println("📦 Creating response DTO...");
+        UserResponseDTO userResponseDTO = DTOMapper.toUserResponseDTO(user);
+        System.out.println("✅ UserResponseDTO created");
+        
+        AuthResponseDTO authResponse = new AuthResponseDTO(jwt, userResponseDTO);
+        System.out.println("✅ AuthResponseDTO created");
+        
+        System.out.println("🎉 Login successful! Returning response...");
+        return ResponseEntity.ok(authResponse);
 
-            return ResponseEntity.ok(authResponse);
-
-        } catch (BadCredentialsException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body(new MessageResponseDTO("Error: Invalid username or password!"));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(new MessageResponseDTO("Error: Authentication failed. " + e.getMessage()));
-        }
+    } catch (BadCredentialsException e) {
+        System.out.println("❌ BadCredentialsException: " + e.getMessage());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+            .body(new MessageResponseDTO("Error: Invalid username or password!"));
+    } catch (Exception e) {
+        System.out.println("❌ Authentication Exception: " + e.getMessage());
+        e.printStackTrace();
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .body(new MessageResponseDTO("Error: Authentication failed. " + e.getMessage()));
     }
+}
 
     @PostMapping("/refresh")
     public ResponseEntity<?> refreshToken(@RequestHeader("Authorization") String authHeader) {

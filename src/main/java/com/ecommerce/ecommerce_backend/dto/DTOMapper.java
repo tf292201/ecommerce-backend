@@ -116,12 +116,19 @@ public class DTOMapper {
         dto.setOrderNumber(order.getOrderNumber());
         dto.setUserId(order.getUser().getId());
         dto.setUsername(order.getUser().getUsername());
-        dto.setOrderStatus(order.getStatus().toString());
+        dto.setOrderStatus(order.getStatus());
         dto.setTotalAmount(order.getTotalAmount());
+        dto.setPaymentMethod(order.getPaymentMethod());
         
         // For now, set addresses to null since Address entity getters aren't fully implemented
-        dto.setShippingAddress(null);
-        dto.setBillingAddress(null);
+        dto.setShippingAddress(order.getShippingAddress());
+    dto.setBillingAddress(order.getBillingAddress());
+    dto.setStripePaymentIntentId(order.getStripePaymentIntentId());
+    
+    dto.setCreatedAt(order.getCreatedAt());
+    dto.setUpdatedAt(order.getUpdatedAt());
+    dto.setShippedDate(order.getShippedDate());
+    dto.setDeliveredDate(order.getDeliveredDate());
         
         // Map order items
         List<OrderItemDTO> orderItemDTOs = order.getOrderItems().stream()
