@@ -6,7 +6,6 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
-
 public class DTOMapper {
     
     // User mappings
@@ -59,7 +58,7 @@ public class DTOMapper {
         );
     }
     
-    // Cart item mappings - FIXED
+    // Cart item mappings
     public static CartItemDTO toCartItemDTO(CartItem cartItem) {
         if (cartItem == null) return null;
         
@@ -79,7 +78,7 @@ public class DTOMapper {
         );
     }
     
-    // Shopping cart mappings - FIXED
+    // Shopping cart mappings
     public static ShoppingCartDTO toShoppingCartDTO(ShoppingCart cart) {
         if (cart == null) return null;
         
@@ -108,6 +107,7 @@ public class DTOMapper {
         );
     }
 
+    // Order mappings
     public static OrderDTO toOrderDTO(Order order) {
         if (order == null) return null;
         
@@ -120,24 +120,21 @@ public class DTOMapper {
         dto.setTotalAmount(order.getTotalAmount());
         dto.setPaymentMethod(order.getPaymentMethod());
         
-        // For now, set addresses to null since Address entity getters aren't fully implemented
+        // Keep legacy text fields for backward compatibility
         dto.setShippingAddress(order.getShippingAddress());
-    dto.setBillingAddress(order.getBillingAddress());
-    dto.setStripePaymentIntentId(order.getStripePaymentIntentId());
-    
-    dto.setCreatedAt(order.getCreatedAt());
-    dto.setUpdatedAt(order.getUpdatedAt());
-    dto.setShippedDate(order.getShippedDate());
-    dto.setDeliveredDate(order.getDeliveredDate());
+        dto.setBillingAddress(order.getBillingAddress());
+        dto.setStripePaymentIntentId(order.getStripePaymentIntentId());
+        
+        dto.setCreatedAt(order.getCreatedAt());
+        dto.setUpdatedAt(order.getUpdatedAt());
+        dto.setShippedDate(order.getShippedDate());
+        dto.setDeliveredDate(order.getDeliveredDate());
         
         // Map order items
         List<OrderItemDTO> orderItemDTOs = order.getOrderItems().stream()
             .map(DTOMapper::toOrderItemDTO)
             .collect(Collectors.toList());
         dto.setOrderItems(orderItemDTOs);
-        
-        dto.setCreatedAt(order.getCreatedAt());
-        dto.setUpdatedAt(order.getUpdatedAt());
         
         return dto;
     }
@@ -155,10 +152,10 @@ public class DTOMapper {
         );
     }
 
-    public static AddressDTO toAddressDTO(Address address) {
+    public static AddressResponseDTO toAddressResponseDTO(Address address) {
         if (address == null) return null;
         
-        return new AddressDTO(
+        return new AddressResponseDTO(
             address.getId(),
             address.getAddressLine1(),
             address.getAddressLine2(),
@@ -166,11 +163,27 @@ public class DTOMapper {
             address.getState(),
             address.getPostalCode(),
             address.getCountry(),
-            address.getType(),
             address.getIsDefault(),
+            address.getType(),
+            address.getFormattedAddress(),
             address.getCreatedAt(),
             address.getUpdatedAt()
         );
     }
-    
+    public static Address toAddressEntity(AddressRequestDTO dto, User user) {
+        if (dto == null) return null;
+        
+        Address address = new Address();
+        address.setUser(user);
+        address.setAddressLine1(dto.getAddressLine1());
+        address.setAddressLine2(dto.getAddressLine2());
+        address.setCity(dto.getCity());
+        address.setState(dto.getState());
+        address.setPostalCode(dto.getPostalCode());
+        address.setCountry(dto.getCountry());
+        address.setIsDefault(dto.getIsDefault());
+        address.setType(dto.getType());
+        
+        return address;
+    }
 }

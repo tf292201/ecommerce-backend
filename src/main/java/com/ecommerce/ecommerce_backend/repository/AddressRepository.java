@@ -1,46 +1,42 @@
 package com.ecommerce.ecommerce_backend.repository;
 
-import java.util.List;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
 import com.ecommerce.ecommerce_backend.entity.Address;
-import com.ecommerce.ecommerce_backend.entity.Address.AddressType;
+import com.ecommerce.ecommerce_backend.entity.User;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface AddressRepository extends JpaRepository<Address, Long> {
-
-    /**
-     * Find all addresses for a user, ordered by default first, then by creation date
-     */
-    List<Address> findByUserIdOrderByIsDefaultDescCreatedAtDesc(Long userId);
-
-    /**
-     * Find addresses by user and type (using enum)
-     */
-    List<Address> findByUserIdAndType(Long userId, AddressType type);
-
-    /**
-     * Find default addresses by user and type (using enum)
-     */
-    List<Address> findByUserIdAndTypeAndIsDefaultTrue(Long userId, AddressType type);
-
-    /**
-     * Find addresses by user and type, ordered by update date
-     */
-    List<Address> findByUserIdAndTypeOrderByUpdatedAtDesc(Long userId, AddressType type);
-
-    /**
-     * Count addresses for a user
-     */
-    long countByUserId(Long userId);
-
-    /**
-     * Delete all addresses for a user (useful for user deletion)
-     */
-    void deleteByUserId(Long userId);
-
-    /**
-     * Check if user has any default address of a type (using enum)
-     */
-    boolean existsByUserIdAndTypeAndIsDefaultTrue(Long userId, AddressType type);
+    
+    List<Address> findByUserOrderByIsDefaultDescCreatedAtDesc(User user);
+    
+    List<Address> findByUserAndTypeOrderByIsDefaultDescCreatedAtDesc(User user, Address.AddressType type);
+    
+    Optional<Address> findByUserAndIsDefaultTrue(User user);
+    
+    Optional<Address> findByIdAndUser(Long id, User user);
+    
+    // Method names that match what your AddressService is calling
+    @Modifying
+    @Query("UPDATE Address a SET a.isDefault = false WHERE a.user = :user")
+    void clearAllDefaultFlagsByUser(@Param("user") User user);
+    
+    @Modifying
+    @Query("UPDATE Address a SET a.isDefault = false WHERE a.user = :user AND a.type = :type")
+    void clearDefaultFlagByUserAndType(@Param("user") User user, @Param("type") Address.AddressType type);
+    
+    // Alternative method names (in case your service uses these)
+    @Modifying
+    @Query("UPDATE Address a SET a.isDefault = false WHERE a.user = :user")
+    void clearAllDefaultForUser(@Param("user") User user);
+    
+    @Modifying
+    @Query("UPDATE Address a SET a.isDefault = false WHERE a.user = :user AND a.type = :type")
+    void clearDefaultForUserAndType(@Param("user") User user, @Param("type") Address.AddressType type);
 }
