@@ -154,5 +154,23 @@ public class DTOMapper {
             orderItem.getTotalPrice()
         );
     }
+
+    public static AddressDTO toAddressDTO(Address address) {
+        if (address == null) return null;
+        
+        return new AddressDTO(
+            address.getId(),
+            address.getAddressLine1(),
+            address.getAddressLine2(),
+            address.getCity(),
+            address.getState(),
+            address.getPostalCode(),
+            address.getCountry(),
+            address.getType(),
+            address.getIsDefault(),
+            address.getCreatedAt(),
+            address.getUpdatedAt()
+        );
+    }
     
 }

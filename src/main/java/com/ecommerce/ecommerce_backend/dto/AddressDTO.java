@@ -1,80 +1,57 @@
-package com.ecommerce.ecommerce_backend.entity;
+package com.ecommerce.ecommerce_backend.dto;
 
-import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import com.ecommerce.ecommerce_backend.entity.Address.AddressType;
 
-@Entity
-@Table(name = "addresses")
-public class Address {
-    
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class AddressDTO {
     private Long id;
-    
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
-    
-    @Column(name = "address_line_1", nullable = false)
     private String addressLine1;
-    
-    @Column(name = "address_line_2")
     private String addressLine2;
-    
-    @Column(nullable = false)
     private String city;
-    
-    @Column(nullable = false)
     private String state;
-    
-    @Column(name = "postal_code", nullable = false)
     private String postalCode;
-    
-    @Column(nullable = false)
     private String country;
-    
-    @Column(name = "is_default")
-    private Boolean isDefault = false;
-    
-    @Enumerated(EnumType.STRING)
-    private AddressType type = AddressType.BOTH;
-
-    @Column(name = "created_at")
+    private AddressType type;
+    private Boolean isDefault;
     private LocalDateTime createdAt;
-
-    @Column(name = "updated_at")
     private LocalDateTime updatedAt;
-    
-    // Lifecycle callbacks
-    @PrePersist
-    protected void onCreate() {
-        createdAt = LocalDateTime.now();
-        updatedAt = LocalDateTime.now();
+
+    // Default constructor
+    public AddressDTO() {}
+
+    // Constructor with essential fields
+    public AddressDTO(String addressLine1, String city, String state, String postalCode, String country) {
+        this.addressLine1 = addressLine1;
+        this.city = city;
+        this.state = state;
+        this.postalCode = postalCode;
+        this.country = country;
     }
 
-    @PreUpdate
-    protected void onUpdate() {
-        updatedAt = LocalDateTime.now();
+    // Full constructor
+    public AddressDTO(Long id, String addressLine1, String addressLine2, String city, String state, 
+                     String postalCode, String country, AddressType type, Boolean isDefault, 
+                     LocalDateTime createdAt, LocalDateTime updatedAt) {
+        this.id = id;
+        this.addressLine1 = addressLine1;
+        this.addressLine2 = addressLine2;
+        this.city = city;
+        this.state = state;
+        this.postalCode = postalCode;
+        this.country = country;
+        this.type = type;
+        this.isDefault = isDefault;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
     }
-    
-    // Constructors
-    public Address() {}
-    
+
     // Getters and Setters
-    public Long getId() { 
-        return id; 
+    public Long getId() {
+        return id;
     }
-    
-    public void setId(Long id) { 
-        this.id = id; 
-    }
-    
-    public User getUser() { 
-        return user; 
-    }
-    
-    public void setUser(User user) { 
-        this.user = user; 
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getAddressLine1() {
@@ -125,20 +102,20 @@ public class Address {
         this.country = country;
     }
 
-    public Boolean getIsDefault() {
-        return isDefault;
-    }
-
-    public void setIsDefault(Boolean isDefault) {
-        this.isDefault = isDefault;
-    }
-
     public AddressType getType() {
         return type;
     }
 
     public void setType(AddressType type) {
         this.type = type;
+    }
+
+    public Boolean getIsDefault() {
+        return isDefault;
+    }
+
+    public void setIsDefault(Boolean isDefault) {
+        this.isDefault = isDefault;
     }
 
     public LocalDateTime getCreatedAt() {
@@ -157,7 +134,7 @@ public class Address {
         this.updatedAt = updatedAt;
     }
 
-    // Helper methods for compatibility
+    // Helper methods for backwards compatibility
     public String getStreet() {
         return addressLine1 + (addressLine2 != null && !addressLine2.isEmpty() ? ", " + addressLine2 : "");
     }
@@ -169,14 +146,25 @@ public class Address {
     public String getAddressType() {
         return type != null ? type.toString() : "BOTH";
     }
-    
-    public enum AddressType {
-        BILLING, SHIPPING, BOTH
+
+    // Utility methods
+    public String getFormattedAddress() {
+        String line2 = addressLine2 != null && !addressLine2.isEmpty() ? ", " + addressLine2 : "";
+        return String.format("%s%s, %s, %s %s, %s", 
+                addressLine1, line2, city, state, postalCode, country);
+    }
+
+    public boolean isShippingAddress() {
+        return type == AddressType.SHIPPING || type == AddressType.BOTH;
+    }
+
+    public boolean isBillingAddress() {
+        return type == AddressType.BILLING || type == AddressType.BOTH;
     }
 
     @Override
     public String toString() {
-        return "Address{" +
+        return "AddressDTO{" +
                 "id=" + id +
                 ", addressLine1='" + addressLine1 + '\'' +
                 ", addressLine2='" + addressLine2 + '\'' +
@@ -184,8 +172,8 @@ public class Address {
                 ", state='" + state + '\'' +
                 ", postalCode='" + postalCode + '\'' +
                 ", country='" + country + '\'' +
-                ", isDefault=" + isDefault +
                 ", type=" + type +
+                ", isDefault=" + isDefault +
                 '}';
     }
 }
