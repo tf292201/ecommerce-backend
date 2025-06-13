@@ -39,6 +39,9 @@ public class ShoppingCartService {
     @Autowired
     private CartItemRepository cartItemRepository;
 
+    @Autowired
+    private InventoryService inventoryService; 
+
     public ShoppingCartDTO getCartByUserId(Long userId) {
         User user = userService.getUserById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -64,10 +67,10 @@ public class ShoppingCartService {
         Product product = productService.getProductById(productId)
                 .orElseThrow(() -> new RuntimeException("Product not found"));
     
-        // 🔧 VALIDATION: Check stock availability
-        if (quantity > product.getStockQuantity()) {
-            throw new IllegalArgumentException("Requested quantity (" + quantity + 
-                ") exceeds available stock (" + product.getStockQuantity() + ")");
+        // 🔥 NEW: Use InventoryService to check stock
+        if (!inventoryService.hasStock(productId, quantity)) {
+            throw new IllegalArgumentException("Insufficient stock. Available: " + 
+                product.getStockQuantity() + ", Requested: " + quantity);
         }
     
         ShoppingCart cart = user.getShoppingCart();
@@ -85,14 +88,13 @@ public class ShoppingCartService {
             CartItem item = existingItem.get();
             int newQuantity = item.getQuantity() + quantity;
             
-            // 🔧 VALIDATION: Check total quantity doesn't exceed stock
-            if (newQuantity > product.getStockQuantity()) {
+            // 🔥 NEW: Check total quantity against available stock
+            if (!inventoryService.hasStock(productId, newQuantity)) {
                 throw new IllegalArgumentException("Total quantity (" + newQuantity + 
                     ") would exceed available stock (" + product.getStockQuantity() + ")");
             }
             
             item.setQuantity(newQuantity);
-            // Recalculate total price
             item.setTotalPrice(item.getUnitPrice().multiply(BigDecimal.valueOf(item.getQuantity())));
             cartItemService.saveCartItem(item);
         } else {
@@ -101,8 +103,6 @@ public class ShoppingCartService {
             cartItem.setShoppingCart(cart);
             cartItem.setProduct(product);
             cartItem.setQuantity(quantity);
-            
-            // SET THE PRICE FIELDS
             cartItem.setUnitPrice(product.getPrice());
             cartItem.setTotalPrice(product.getPrice().multiply(BigDecimal.valueOf(quantity)));
             
@@ -110,7 +110,7 @@ public class ShoppingCartService {
             cart.getCartItems().add(cartItem);
         }
     
-        // 🔧 RECALCULATE CART TOTAL
+        // Recalculate cart total
         recalculateCartTotal(cart);
         cart = shoppingCartRepository.save(cart);
         return DTOMapper.toShoppingCartDTO(cart);
