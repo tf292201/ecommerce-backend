@@ -55,9 +55,9 @@ public class OrderController {
             }
 
             // Create order with Stripe payment processing (all handled in OrderService now)
-            OrderDTO order = orderService.createOrderFromCart(user.getId(), request);
-            
-            return ResponseEntity.status(HttpStatus.CREATED).body(order);
+            OrderDTO order = orderService.createOrderFromCart(username, request);
+
+           return ResponseEntity.status(HttpStatus.CREATED).body(order);
             
         } catch (Exception e) {
             return ResponseEntity.badRequest()

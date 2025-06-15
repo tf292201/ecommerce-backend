@@ -27,7 +27,21 @@ public class AddressService {
                 .map(DTOMapper::toAddressResponseDTO)
                 .collect(Collectors.toList());
     }
+
+    public Optional<Address> getAddressByUserAndId(User user, Long addressId) {
+        return addressRepository.findById(addressId)
+                .filter(address -> address.getUser().getId().equals(user.getId()));
+    }
     
+    public Optional<Address> getDefaultAddressEntity(User user) {
+        return addressRepository.findByUserAndIsDefaultTrue(user);
+    }
+
+
+public Optional<Address> getDefaultAddressEntityByType(User user, Address.AddressType type) {
+    return addressRepository.findByUserAndTypeAndIsDefaultTrue(user, type);
+}
+
     // Get addresses by type
     public List<AddressResponseDTO> getUserAddressesByType(User user, Address.AddressType type) {
         List<Address> addresses = addressRepository.findByUserAndTypeOrderByIsDefaultDescCreatedAtDesc(user, type);
